@@ -6,3 +6,8 @@ global using System.Threading.Tasks;
 global using System.ComponentModel.DataAnnotations;
 global using WebStore_z80.Models.DomainModels.ProductAggregates;
 global using Microsoft.EntityFrameworkCore;
+global using WebStore_z80.ApplicationServices.Services;
+global using WebStore_z80.ApplicationServices.Services.Contract;
+global using WebStore_z80.Models.DBContext;
+global using WebStore_z80.Models.Services.Contracts;
+global using WebStore_z80.Models.Services.Repositories;
