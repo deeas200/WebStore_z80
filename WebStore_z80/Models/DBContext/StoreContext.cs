@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿
 namespace WebStore_z80.Models.DBContext
 {
     public class StoreContext:DbContext
@@ -7,5 +7,7 @@ namespace WebStore_z80.Models.DBContext
           : base(options)
         {
         }
+
+        DbSet<Product> products {  get; set; }
     }
 }

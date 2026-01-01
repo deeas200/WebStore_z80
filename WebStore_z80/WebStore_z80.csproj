@@ -22,7 +22,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Models\Services\" />
+    <Folder Include="Models\Services\Contracts\" />
+    <Folder Include="Models\Services\Repositories\" />
   </ItemGroup>
 
 </Project>
