@@ -8,6 +8,6 @@ namespace WebStore_z80.Models.DBContext
         {
         }
 
-        DbSet<Product> products {  get; set; }
+       public DbSet<Product> product {  get; set; }
     }
 }

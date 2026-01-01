@@ -21,9 +21,4 @@
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.EntityFrameworkCore" Version="9.0.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Models\Services\Contracts\" />
-    <Folder Include="Models\Services\Repositories\" />
-  </ItemGroup>
-
 </Project>
