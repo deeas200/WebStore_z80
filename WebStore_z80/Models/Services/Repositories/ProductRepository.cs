@@ -44,10 +44,11 @@ namespace WebStore_z80.Models.Services.Repositories
         {
             try
             {
-                var product = await _context.product.FirstOrDefaultAsync(x => x.Id == id);
+                var product = _context.product.FirstOrDefault(x => x.Id == id);
                 if (product != null)
                 {
                     _context.product.Remove(product);
+                    _context.SaveChanges();
                 }
             }
             catch (Exception)
@@ -60,27 +61,33 @@ namespace WebStore_z80.Models.Services.Repositories
         #endregion
 
         #region Select
-        public async Task<List<Product>> SellectAllProduct()
+
+        public IEnumerable<Product> SellectAllProduct()
         {
-            try
-            {
-                return await _context.product.ToListAsync();
-
-            }
-            catch (Exception)
-            {
-
-                throw;
-            }
+            return _context.product.ToList();
         }
+        //public async Task<List<Product>> SellectAllProduct()
+        //{
+        //    try
+        //    {
+        //        return _context.product.ToList();
+        //      //  return await _context.product.ToListAsync();
+
+        //    }
+        //    catch (Exception)
+        //    {
+
+        //        throw;
+        //    }
+        //}
 
 
 
-        public async Task<Product> SelectProductById(Guid id)
+        public Product SelectProductById(Guid id)
         {
             try
             {
-                var product = await _context.product.FirstOrDefaultAsync(x => x.Id == id);
+                var product =_context.product.FirstOrDefault(x => x.Id == id);
 
                 return product;
 
@@ -94,7 +101,7 @@ namespace WebStore_z80.Models.Services.Repositories
         #endregion
 
         #region Update
-        public async Task UpdateProduct(Product product)
+        public void UpdateProduct(Product product)
         {
             _context.product.Update(product);
             _context.SaveChanges(true);

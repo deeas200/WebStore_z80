@@ -17,6 +17,10 @@ namespace WebStore_z80.Controllers
         {
             return View();
         }
+        public IActionResult IndexAdmin()
+        {
+            return View();
+        }
 
         public IActionResult Privacy()
         {

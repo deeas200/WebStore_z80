@@ -1,0 +1,278 @@
+﻿<!DOCTYPE html>
+<html lang="fa" dir="rtl" data-bs-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    @* <title>قالب با سایدبار راست</title> *@
+    <!-- Bootstrap 5.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="~/css/Style_Admin.css">
+
+    @* <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /> *@
+    <title>@ViewData["Title"] - WebStore_z80</title>
+    <script type="importmap"></script>
+    @* <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" /> *@
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/WebStore_z80.styles.css" asp-append-version="true" />
+</head>
+<body>
+    <!-- سایدبار -->
+    <nav id="sidebar" class="bg-body-tertiary">
+        <div class="p-4">
+            <!-- هدر سایدبار -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 class="mb-0">پنل کناری</h4>
+                <button id="closeSidebar" class="btn btn-outline-secondary d-lg-none">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+
+            <!-- پروفایل کاربر -->
+            <div class="text-center mb-4">
+                <img src="https://via.placeholder.com/100" alt="پروفایل" class="rounded-circle mb-3 border" width="100" height="100">
+                <h5>کاربر نمونه</h5>
+                <p class="text-muted">user@example.com</p>
+            </div>
+
+            <!-- منوی سایدبار -->
+            <ul class="nav flex-column">
+                <li class="nav-item mb-2">
+                    <a class="nav-link active bg-primary text-white rounded" href="#">
+                        <i class="bi bi-house-door me-2"></i>
+                        داشبورد
+                    </a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a class="nav-link text-dark" href="#">
+                        <i class="bi bi-bar-chart me-2"></i>
+                        آمارها
+                    </a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a class="nav-link text-dark" href="#">
+                        <i class="bi bi-file-earmark me-2"></i>
+                        صفحات
+                    </a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a class="nav-link text-dark" href="#">
+                        <i class="bi bi-envelope me-2"></i>
+                        پیام‌ها
+                        <span class="badge bg-danger float-start">3</span>
+                    </a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a class="nav-link text-dark" href="#">
+                        <i class="bi bi-gear me-2"></i>
+                        تنظیمات
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-dark" href="#">
+                        <i class="bi bi-box-arrow-left me-2"></i>
+                        خروج
+                    </a>
+                </li>
+            </ul>
+
+            <!-- بخش اضافی -->
+            <div class="mt-5">
+                <h6 class="text-muted mb-3">پروژه‌های فعال</h6>
+                <div class="progress mb-2" style="height: 8px;">
+                    <div class="progress-bar bg-success" style="width: 75%"></div>
+                </div>
+                <small>پروژه اول: 75%</small>
+
+                <div class="progress mt-3 mb-2" style="height: 8px;">
+                    <div class="progress-bar bg-info" style="width: 45%"></div>
+                </div>
+                <small>پروژه دوم: 45%</small>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Overlay برای موبایل -->
+    <div id="overlay" class="overlay"></div>
+
+    <!-- محتوای اصلی -->
+    <main id="main-content">
+        <!-- نوار بالایی -->
+        <header class="bg-white border-bottom py-3 px-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h4 mb-0">داشبورد اصلی</h1>
+                    <p class="text-muted small mb-0">خوش آمدید به پنل مدیریت</p>
+                </div>
+
+                <div class="d-flex align-items-center gap-3">
+                    <!-- دکمه تغییر حالت دارک/لایت -->
+                    <button id="themeToggle" class="btn btn-outline-secondary">
+                        <i class="bi bi-moon" id="themeIcon"></i>
+                    </button>
+
+                    <!-- اعلان‌ها -->
+                    <div class="dropdown">
+                        <button class="btn btn-outline-secondary position-relative" type="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-bell"></i>
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                2
+                            </span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><h6 class="dropdown-header">اعلان‌ها</h6></li>
+                            <li><a class="dropdown-item" href="#">پیام جدید دریافت شد</a></li>
+                            <li><a class="dropdown-item" href="#">کاربر جدید ثبت‌نام کرد</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- کاربر -->
+                    <div class="dropdown">
+                        <button class="btn btn-outline-secondary d-flex align-items-center" type="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-person-circle me-2"></i>
+                            کاربر
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="#">پروفایل</a></li>
+                            <li><a class="dropdown-item" href="#">تنظیمات</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#">خروج</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- محتوای صفحه -->
+        <div class="container-fluid p-4">
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="alert alert-info fade-in">
+                        <i class="bi bi-info-circle me-2"></i>
+                        این یک قالب رسپانسیو با سایدبار سمت راست و قابلیت تغییر حالت تاریک/روشن است.
+                    </div>
+                </div>
+            </div>
+
+            <!-- کارت‌های آمار -->
+            <div class="row g-4 mb-4">
+                <div class="col-md-3 col-sm-6">
+                    <div class="custom-card card bg-primary text-white shadow">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h5 class="card-title">کاربران</h5>
+                                    <h2 class="mb-0">1,245</h2>
+                                </div>
+                                <div class="align-self-center">
+                                    <i class="bi bi-people fs-1"></i>
+                                </div>
+                            </div>
+                            <p class="card-text mt-2">
+                                <i class="bi bi-arrow-up"></i>
+                                12% افزایش نسبت به ماه گذشته
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-3 col-sm-6">
+                    <div class="custom-card card bg-success text-white shadow">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h5 class="card-title">فروش</h5>
+                                    <h2 class="mb-0">$23,456</h2>
+                                </div>
+                                <div class="align-self-center">
+                                    <i class="bi bi-currency-dollar fs-1"></i>
+                                </div>
+                            </div>
+                            <p class="card-text mt-2">
+                                <i class="bi bi-arrow-up"></i>
+                                8% افزایش نسبت به ماه گذشته
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-3 col-sm-6">
+                    <div class="custom-card card bg-warning text-dark shadow">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h5 class="card-title">بازدید</h5>
+                                    <h2 class="mb-0">45,678</h2>
+                                </div>
+                                <div class="align-self-center">
+                                    <i class="bi bi-eye fs-1"></i>
+                                </div>
+                            </div>
+                            <p class="card-text mt-2">
+                                <i class="bi bi-arrow-down"></i>
+                                3% کاهش نسبت به ماه گذشته
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-3 col-sm-6">
+                    <div class="custom-card card bg-info text-white shadow">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h5 class="card-title">نرخ تبدیل</h5>
+                                    <h2 class="mb-0">4.5%</h2>
+                                </div>
+                                <div class="align-self-center">
+                                    <i class="bi bi-graph-up fs-1"></i>
+                                </div>
+                            </div>
+                            <p class="card-text mt-2">
+                                <i class="bi bi-arrow-up"></i>
+                                1.2% افزایش نسبت به ماه گذشته
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- محتوای اصلی -->
+            <div class="row g-4">
+                @RenderBody()
+            </div>
+        </div>
+
+        <!-- فوتر -->
+        <footer class="bg-body-tertiary border-top py-3 px-4 mt-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="text-muted small">
+                    © 2023 کلیه حقوق محفوظ است.
+                </div>
+                <div class="small">
+                    <a href="#" class="text-decoration-none me-3">حریم خصوصی</a>
+                    <a href="#" class="text-decoration-none">قوانین</a>
+                </div>
+            </div>
+        </footer>
+    </main>
+
+    <!-- دکمه نمایش سایدبار در موبایل -->
+    <button class="sidebar-toggle btn btn-primary rounded-circle p-3">
+        <i class="bi bi-list fs-4"></i>
+    </button>
+
+    <!-- Bootstrap JS & Chart.js -->
+    @* <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script> *@
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="~/js/Javascript_Admin.js"></script>
+
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

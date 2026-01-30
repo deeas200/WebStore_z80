@@ -1,0 +1,48 @@
+﻿@model IEnumerable<ProductList>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>لیست محصولات</h1>
+
+<p>
+    <a asp-action="ProductCreate" class="btn btn-outline-primary">ثبت محصول جدید</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.ProductName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ProductDescription)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.UnitPrice)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ProductName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ProductDescription)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.UnitPrice)
+                </td>
+                <td>
+                    <a asp-action="ProductUpdate" asp-route-id="@item.Id" class="btn btn-primary m-2">ویرایش</a>
+                    <a asp-action="ProductDetails" asp-route-id="@item.Id" class="btn btn-info m-2">جزئیات</a>
+                    <a asp-action="ProductDelete" asp-route-id="@item.Id" class="btn btn-danger m-2">حذف</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

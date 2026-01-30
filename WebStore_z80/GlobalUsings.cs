@@ -11,3 +11,4 @@ global using WebStore_z80.ApplicationServices.Services.Contract;
 global using WebStore_z80.Models.DBContext;
 global using WebStore_z80.Models.Services.Contracts;
 global using WebStore_z80.Models.Services.Repositories;
+global using WebStore_z80.ApplicationServices.Dtos.ProductDtos;
