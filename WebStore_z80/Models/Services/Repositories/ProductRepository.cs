@@ -66,20 +66,7 @@ namespace WebStore_z80.Models.Services.Repositories
         {
             return _context.product.ToList();
         }
-        //public async Task<List<Product>> SellectAllProduct()
-        //{
-        //    try
-        //    {
-        //        return _context.product.ToList();
-        //      //  return await _context.product.ToListAsync();
-
-        //    }
-        //    catch (Exception)
-        //    {
-
-        //        throw;
-        //    }
-        //}
+      
 
 
 
