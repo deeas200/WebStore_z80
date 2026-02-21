@@ -1,0 +1,522 @@
+﻿<!-- Views/Home/Index.cshtml -->
+@{
+    ViewData["Title"] = "مدیریت محصولات";
+}
+
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <!-- Bootstrap 5 RTL CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Vazir', 'Segoe UI', Tahoma, Arial, sans-serif;
+            background-color: #f8f9fa;
+            padding: 20px;
+        }
+        .modal-header {
+            background-color: #007bff;
+            color: white;
+        }
+        .btn-close {
+            filter: invert(1);
+        }
+        .table th {
+            background-color: #343a40;
+            color: white;
+        }
+        .action-buttons .btn {
+            margin: 0 2px;
+        }
+        .search-box {
+            margin-bottom: 20px;
+        }
+        .loading-spinner {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 9999;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Spinner -->
+    <div class="loading-spinner" id="loadingSpinner">
+        <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+            <span class="visually-hidden">در حال بارگذاری...</span>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1 class="text-center mb-4">مدیریت محصولات</h1>
+
+        <!-- دکمه افزودن محصول جدید و جستجو -->
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <button type="button" class="btn btn-primary" onclick="openCreateModal()">
+                    <i class="fas fa-plus"></i> افزودن محصول جدید
+                </button>
+            </div>
+            <div class="col-md-6">
+                <div class="input-group search-box">
+                    <input type="text" id="searchInput" class="form-control" placeholder="جستجو در نام محصول..." onkeyup="searchProducts()">
+                    <span class="input-group-text"><i class="fas fa-search"></i></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- جدول نمایش محصولات -->
+        <div class="table-responsive">
+            <table class="table table-striped table-hover table-bordered" id="productsTable">
+                <thead>
+                    <tr>
+                        <th>ردیف</th>
+                        <th>نام محصول</th>
+                        <th>توضیحات</th>
+                        <th>قیمت</th>
+                        <th>عملیات</th>
+                    </tr>
+                </thead>
+                <tbody id="productsTableBody">
+                    <tr>
+                        <td colspan="5" class="text-center">در حال بارگذاری...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- صفحه‌بندی -->
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center" id="pagination">
+            </ul>
+        </nav>
+    </div>
+
+    <!-- مودال افزودن/ویرایش محصول -->
+    <div class="modal fade" id="productModal" tabindex="-1" aria-labelledby="productModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="productModalLabel">افزودن محصول جدید</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="productForm" novalidate>
+                        <input type="hidden" id="productId">
+                        <div class="mb-3">
+                            <label for="productName" class="form-label">نام محصول</label>
+                            <input type="text" class="form-control" id="productName" required>
+                            <div class="invalid-feedback">نام محصول را وارد کنید</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="productDescription" class="form-label">توضیحات</label>
+                            <textarea class="form-control" id="productDescription" rows="3" required></textarea>
+                            <div class="invalid-feedback">توضیحات محصول را وارد کنید</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="unitPrice" class="form-label">قیمت (ریال)</label>
+                            <input type="number" class="form-control" id="unitPrice" required min="0" step="0.01">
+                            <div class="invalid-feedback">قیمت محصول را وارد کنید</div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">انصراف</button>
+                    <button type="button" class="btn btn-primary" onclick="saveProduct()">ذخیره</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- مودال تایید حذف -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="deleteModalLabel">تایید حذف</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    آیا از حذف این محصول اطمینان دارید؟
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">انصراف</button>
+                    <button type="button" class="btn btn-danger" onclick="confirmDelete()">حذف</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // متغیرهای سراسری
+        let products = [];
+        let currentPage = 1;
+        let pageSize = 5;
+        let deleteId = null;
+
+        // بارگذاری اولیه داده‌ها
+        document.addEventListener('DOMContentLoaded', function() {
+            loadProducts();
+        });
+
+        // نمایش/مخفی کردن اسپینر بارگذاری
+        function toggleLoading(show) {
+            document.getElementById('loadingSpinner').style.display = show ? 'block' : 'none';
+        }
+
+        // دریافت لیست محصولات از API
+        async function loadProducts() {
+            toggleLoading(true);
+            try {
+                const response = await fetch('/api/ProductsApi');
+                if (!response.ok) {
+                    throw new Error('خطا در دریافت اطلاعات');
+                }
+                products = await response.json();
+                displayProducts();
+            } catch (error) {
+                showAlert('خطا در دریافت اطلاعات: ' + error.message, 'danger');
+                document.getElementById('productsTableBody').innerHTML =
+                    '<tr><td colspan="5" class="text-center text-danger">خطا در بارگذاری داده‌ها</td></tr>';
+            } finally {
+                toggleLoading(false);
+            }
+        }
+
+        // نمایش محصولات در جدول با صفحه‌بندی
+        function displayProducts() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+            const filteredProducts = searchTerm ?
+                products.filter(p => p.productName.toLowerCase().includes(searchTerm)) :
+                products;
+
+            const totalItems = filteredProducts.length;
+            const totalPages = Math.ceil(totalItems / pageSize);
+
+            // تنظیم صفحه جاری
+            if (currentPage > totalPages && totalPages > 0) {
+                currentPage = totalPages;
+            }
+
+            const startIndex = (currentPage - 1) * pageSize;
+            const endIndex = Math.min(startIndex + pageSize, totalItems);
+            const paginatedProducts = filteredProducts.slice(startIndex, endIndex);
+
+            const tbody = document.getElementById('productsTableBody');
+
+            if (paginatedProducts.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center">هیچ محصولی یافت نشد</td></tr>';
+            } else {
+                tbody.innerHTML = '';
+                paginatedProducts.forEach((product, index) => {
+                    const row = tbody.insertRow();
+                    row.innerHTML = `
+                        <td>${startIndex + index + 1}</td>
+                        <td>${escapeHtml(product.productName)}</td>
+                        <td>${escapeHtml(product.productDescription)}</td>
+                        <td>${product.unitPrice.toLocaleString()} ریال</td>
+                        <td class="action-buttons">
+                            <button class="btn btn-sm btn-info" onclick="viewProduct('${product.id}')" title="مشاهده">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="btn btn-sm btn-warning" onclick="editProduct('${product.id}')" title="ویرایش">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="openDeleteModal('${product.id}')" title="حذف">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    `;
+                });
+            }
+
+            displayPagination(totalPages);
+        }
+
+        // فرار از کاراکترهای HTML برای جلوگیری از XSS
+        function escapeHtml(unsafe) {
+            return unsafe
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        // نمایش صفحه‌بندی
+        function displayPagination(totalPages) {
+            const pagination = document.getElementById('pagination');
+            pagination.innerHTML = '';
+
+            if (totalPages <= 1) return;
+
+            // دکمه قبلی
+            const prevLi = document.createElement('li');
+            prevLi.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
+            prevLi.innerHTML = `<a class="page-link" href="#" onclick="changePage(${currentPage - 1}); return false;">قبلی</a>`;
+            pagination.appendChild(prevLi);
+
+            // دکمه‌های صفحات
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === 1 || i === totalPages || (i >= currentPage - 2 && i <= currentPage + 2)) {
+                    const li = document.createElement('li');
+                    li.className = `page-item ${i === currentPage ? 'active' : ''}`;
+                    li.innerHTML = `<a class="page-link" href="#" onclick="changePage(${i}); return false;">${i}</a>`;
+                    pagination.appendChild(li);
+                } else if (i === currentPage - 3 || i === currentPage + 3) {
+                    const li = document.createElement('li');
+                    li.className = 'page-item disabled';
+                    li.innerHTML = '<span class="page-link">...</span>';
+                    pagination.appendChild(li);
+                }
+            }
+
+            // دکمه بعدی
+            const nextLi = document.createElement('li');
+            nextLi.className = `page-item ${currentPage === totalPages ? 'disabled' : ''}`;
+            nextLi.innerHTML = `<a class="page-link" href="#" onclick="changePage(${currentPage + 1}); return false;">بعدی</a>`;
+            pagination.appendChild(nextLi);
+        }
+
+        // تغییر صفحه
+        function changePage(page) {
+            if (page < 1) return;
+            currentPage = page;
+            displayProducts();
+        }
+
+        // جستجو در محصولات
+        function searchProducts() {
+            currentPage = 1;
+            displayProducts();
+        }
+
+        // باز کردن مودال ایجاد محصول جدید
+        function openCreateModal() {
+            resetForm();
+            document.getElementById('productModalLabel').textContent = 'افزودن محصول جدید';
+
+            const modal = new bootstrap.Modal(document.getElementById('productModal'));
+            modal.show();
+        }
+
+        // ریست فرم
+        function resetForm() {
+            document.getElementById('productForm').reset();
+            document.getElementById('productId').value = '';
+            document.getElementById('productForm').classList.remove('was-validated');
+
+            // فعال کردن فیلدها
+            document.getElementById('productName').disabled = false;
+            document.getElementById('productDescription').disabled = false;
+            document.getElementById('unitPrice').disabled = false;
+
+            // بازیابی دکمه‌ها
+            const modalFooter = document.querySelector('#productModal .modal-footer');
+            modalFooter.innerHTML = `
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">انصراف</button>
+                <button type="button" class="btn btn-primary" onclick="saveProduct()">ذخیره</button>
+            `;
+        }
+
+        // مشاهده جزئیات محصول
+        async function viewProduct(id) {
+            toggleLoading(true);
+            try {
+                const response = await fetch(`/api/ProductsApi/${id}`);
+                if (!response.ok) {
+                    throw new Error('خطا در دریافت اطلاعات محصول');
+                }
+                const product = await response.json();
+
+                document.getElementById('productModalLabel').textContent = 'مشاهده محصول';
+                document.getElementById('productId').value = product.id;
+                document.getElementById('productName').value = product.productName;
+                document.getElementById('productDescription').value = product.productDescription;
+                document.getElementById('unitPrice').value = product.unitPrice;
+
+                // غیرفعال کردن فیلدها
+                document.getElementById('productName').disabled = true;
+                document.getElementById('productDescription').disabled = true;
+                document.getElementById('unitPrice').disabled = true;
+
+                // مخفی کردن دکمه ذخیره و نمایش دکمه بستن
+                const modalFooter = document.querySelector('#productModal .modal-footer');
+                modalFooter.innerHTML = `
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">بستن</button>
+                `;
+
+                const modal = new bootstrap.Modal(document.getElementById('productModal'));
+                modal.show();
+            } catch (error) {
+                showAlert('خطا در دریافت اطلاعات: ' + error.message, 'danger');
+            } finally {
+                toggleLoading(false);
+            }
+        }
+
+        // ویرایش محصول
+        async function editProduct(id) {
+            toggleLoading(true);
+            try {
+                const response = await fetch(`/api/ProductsApi/${id}`);
+                if (!response.ok) {
+                    throw new Error('خطا در دریافت اطلاعات محصول');
+                }
+                const product = await response.json();
+
+                document.getElementById('productModalLabel').textContent = 'ویرایش محصول';
+                document.getElementById('productId').value = product.id;
+                document.getElementById('productName').value = product.productName;
+                document.getElementById('productDescription').value = product.productDescription;
+                document.getElementById('unitPrice').value = product.unitPrice;
+
+                // فعال کردن فیلدها
+                document.getElementById('productName').disabled = false;
+                document.getElementById('productDescription').disabled = false;
+                document.getElementById('unitPrice').disabled = false;
+
+                // بازیابی دکمه ذخیره
+                const modalFooter = document.querySelector('#productModal .modal-footer');
+                modalFooter.innerHTML = `
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">انصراف</button>
+                    <button type="button" class="btn btn-primary" onclick="saveProduct()">ذخیره</button>
+                `;
+
+                const modal = new bootstrap.Modal(document.getElementById('productModal'));
+                modal.show();
+            } catch (error) {
+                showAlert('خطا در دریافت اطلاعات: ' + error.message, 'danger');
+            } finally {
+                toggleLoading(false);
+            }
+        }
+
+        // ذخیره محصول (ایجاد یا ویرایش)
+        async function saveProduct() {
+            // اعتبارسنجی فرم
+            const form = document.getElementById('productForm');
+            if (!form.checkValidity()) {
+                form.classList.add('was-validated');
+                return;
+            }
+
+            const id = document.getElementById('productId').value;
+            const productData = {
+                productName: document.getElementById('productName').value.trim(),
+                productDescription: document.getElementById('productDescription').value.trim(),
+                unitPrice: parseFloat(document.getElementById('unitPrice').value)
+            };
+
+            // اعتبارسنجی اضافی
+            if (productData.unitPrice < 0) {
+                showAlert('قیمت نمی‌تواند منفی باشد', 'warning');
+                return;
+            }
+
+            toggleLoading(true);
+            try {
+                let url = '/api/ProductsApi';
+                let method = 'POST';
+
+                if (id) {
+                    // ویرایش
+                    url = `/api/ProductsApi/${id}`;
+                    method = 'PUT';
+                    productData.id = id;
+                }
+
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(productData)
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.message || 'خطا در ذخیره اطلاعات');
+                }
+
+                // بستن مودال
+                bootstrap.Modal.getInstance(document.getElementById('productModal')).hide();
+
+                // نمایش پیام موفقیت
+                showAlert(result.message, 'success');
+
+                // بارگذاری مجدد محصولات
+                await loadProducts();
+            } catch (error) {
+                showAlert('خطا: ' + error.message, 'danger');
+            } finally {
+                toggleLoading(false);
+            }
+        }
+
+        // باز کردن مودال حذف
+        function openDeleteModal(id) {
+            deleteId = id;
+            const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+            modal.show();
+        }
+
+        // تایید حذف محصول
+        async function confirmDelete() {
+            toggleLoading(true);
+            try {
+                const response = await fetch(`/api/ProductsApi/${deleteId}`, {
+                    method: 'DELETE'
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.message || 'خطا در حذف محصول');
+                }
+
+                // بستن مودال
+                bootstrap.Modal.getInstance(document.getElementById('deleteModal')).hide();
+
+                // نمایش پیام موفقیت
+                showAlert(result.message, 'success');
+
+                // بارگذاری مجدد محصولات
+                await loadProducts();
+            } catch (error) {
+                showAlert('خطا: ' + error.message, 'danger');
+            } finally {
+                toggleLoading(false);
+            }
+        }
+
+        // نمایش پیام هشدار
+        function showAlert(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3`;
+            alertDiv.style.zIndex = '9999';
+            alertDiv.style.minWidth = '300px';
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            `;
+            document.body.appendChild(alertDiv);
+
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 using WebStore_z80.ApplicationServices.Dtos.ProductDtos;
 
 namespace WebStore_z80.Controllers
@@ -22,20 +23,21 @@ namespace WebStore_z80.Controllers
         }
 
         [HttpPost]
-        public IActionResult ProductCreate(ProductCreate product)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ProductCreate(PostProductDto postProductDto)
         {
             if (ModelState.IsValid)
             {
-                _productService.InsertProduct(product);
+                _productService.PostAsync(postProductDto);
                 //_productService.AddProductAsync(productCreate);
                 return RedirectToAction(nameof(ProductList));
             }
-            return View(product);
+            return View(postProductDto);
         }
 
         public async Task<IActionResult> ProductList()
         {
-            return View(await _productService.SellectAllProduct());
+            return View(await _productService.GetAll());
         }
 
         public IActionResult ProductDetails(Guid id)
@@ -45,7 +47,7 @@ namespace WebStore_z80.Controllers
                 return NotFound();
             }
 
-            var product = _productService.SelectProductById(id);
+            var product = _productService.GetProductByIdAsync(id);
             if (product == null)
             {
                 return NotFound();
@@ -62,12 +64,12 @@ namespace WebStore_z80.Controllers
                 return NotFound();
             }
 
-            var productDetail = _productService.SelectProductById(id);
+            var productDetail =await _productService.GetProductByIdAsync(id);
             if (productDetail == null)
             {
                 return NotFound();
             }
-            var productUpdate = new ProductUpdate
+            var productUpdate = new PutProductDto
             {
                 Id = productDetail.Id,
                 ProductName = productDetail.ProductName,
@@ -80,7 +82,7 @@ namespace WebStore_z80.Controllers
         // POST: Products/ProductUpdate/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult ProductUpdate(Guid id, [Bind("Id,ProductName,ProductDescription,UnitPrice")] ProductUpdate productUpdate)
+        public async Task<IActionResult> ProductUpdate(Guid id, [Bind("Id,ProductName,ProductDescription,UnitPrice")] PutProductDto productUpdate)
         {
             if (id != productUpdate.Id)
             {
@@ -91,7 +93,7 @@ namespace WebStore_z80.Controllers
             {
                 try
                 {
-                    _productService.UpdateProduct(productUpdate);
+                  await  _productService.PutAsync(productUpdate);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -117,7 +119,7 @@ namespace WebStore_z80.Controllers
                 return NotFound();
             }
 
-            var product = _productService.SelectProductById(id);
+            var product =await _productService.GetProductByIdAsync(id);
             if (product == null)
             {
                 return NotFound();
@@ -131,12 +133,12 @@ namespace WebStore_z80.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
-            var product = _productService.SelectProductById(id);
+            var product = _productService.GetProductByIdAsync(id);
             if (product != null)
             {
-                var productDelete = new ProductDelete();
+                var productDelete = new DeleteProductDto();
                 productDelete.Id = id;
-                _productService.DeleteProduct(productDelete.Id);
+                _productService.DeleteAsync(productDelete.Id);
             }
             return RedirectToAction(nameof(ProductList));
         }

@@ -1,6 +1,6 @@
 ﻿namespace WebStore_z80.ApplicationServices.Dtos.ProductDtos
 {
-    public class ProductList
+    public class GetProductDto
     {
         public Guid Id { get; set; }
 
